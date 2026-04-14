@@ -3,6 +3,7 @@ import { Alert, Box, Button, Divider, FormControl, Grid, InputLabel, MenuItem, P
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+import { copyToClipboard } from '../../utils/clipboard';
 
 export default function LaptopForm() {
   const { id } = useParams();
@@ -114,7 +115,8 @@ export default function LaptopForm() {
   // Copy any text field value to clipboard.
   const handleCopy = async (value) => {
     try {
-      await navigator.clipboard.writeText(String(value || ''));
+      const success = await copyToClipboard(String(value || ''));
+      if (!success) setError('Copy thất bại.');
     } catch (err) {
       setError('Copy thất bại.');
     }

@@ -3,6 +3,7 @@ import { Alert, Box, Typography, Paper, TextField, Button, IconButton, Table, Ta
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, IosShare as ShareIcon, Remove as RemoveIcon, MoreVert as MoreVertIcon, ToggleOn as ToggleOnIcon, Sell as SellIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+import { copyToClipboard } from '../../utils/clipboard';
 
 export default function LaptopList() {
   const theme = useTheme();
@@ -103,9 +104,13 @@ export default function LaptopList() {
     if (!serial) return;
     const shareUrl = `${window.location.origin}/share/${serial}`;
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      setToast('Đã copy link chia sẻ');
-      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      const success = await copyToClipboard(shareUrl);
+      if (success) {
+        setToast('Đã copy link chia sẻ');
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        setToast('Không thể copy link chia sẻ');
+      }
     } catch (err) {
       setToast('Không thể copy link chia sẻ');
     }

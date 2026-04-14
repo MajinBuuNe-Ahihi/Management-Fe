@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+import { copyToClipboard } from '../../utils/clipboard';
 import { GOOGLE_MAP_OPTIONS } from '../../config/googleMaps';
 
 export default function LaptopFormNew() {
@@ -170,7 +171,8 @@ export default function LaptopFormNew() {
   // Copy selected content to clipboard.
   const handleCopy = async (value) => {
     try {
-      await navigator.clipboard.writeText(String(value || ''));
+      const success = await copyToClipboard(String(value || ''));
+      if (!success) setError('Copy thất bại');
     } catch (err) {
       setError('Copy thất bại');
     }
