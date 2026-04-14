@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { clearAuthToken, getAuthToken } from '../utils/auth';
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const rawBaseUrl = ('http://223.130.11.17/api').replace(/\/+$/, '');
+const apiBaseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+
+console.log('API Base URL configured as:', apiBaseUrl);
 
 const axiosClient = axios.create({
   baseURL: apiBaseUrl,
