@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Box, Button, Divider, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Snackbar, TextField, Typography } from '@mui/material';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { useNavigate, useParams } from 'react-router-dom';
-import axiosClient from '../../api/axiosClient';
+import { laptop_api } from '../../api/laptop_api';
 import { copyToClipboard } from '../../utils/clipboard';
 
 export default function LaptopForm() {
@@ -43,11 +43,11 @@ export default function LaptopForm() {
     if (!isEditMode) return;
     const fetchLaptop = async () => {
       try {
-        const res = await axiosClient.get(`/laptops/${id}`);
+        const data = await laptop_api.get_api(`/laptops/${id}`);
         setFormData({
-          ...res.data,
-          createdDate: res.data?.createdDate ? res.data.createdDate.slice(0, 10) : '',
-          seo_keywords: Array.isArray(res.data?.seo_keywords) ? res.data.seo_keywords : []
+          ...data,
+          createdDate: data?.createdDate ? data.createdDate.slice(0, 10) : '',
+          seo_keywords: Array.isArray(data?.seo_keywords) ? data.seo_keywords : []
         });
       } catch (err) {
         setError('Failed to fetch laptop details');
@@ -85,8 +85,8 @@ export default function LaptopForm() {
     try {
       setIsAnalyzing(true);
       setError('');
-      const res = await axiosClient.post('/laptops/extract-info', { text: rawInformation });
-      setFormData((prev) => ({ ...prev, ...res.data, source: 'AI' }));
+      const data = await laptop_api.extract_info_api(rawInformation);
+      setFormData((prev) => ({ ...prev, ...data, source: 'AI' }));
     } catch (err) {
       setError(err.response?.data?.message || 'Khong the phan tich thong tin.');
     } finally {
@@ -104,8 +104,8 @@ export default function LaptopForm() {
         : String(formData.seo_keywords || '').split(',').map((item) => item.trim()).filter(Boolean)
     };
     try {
-      if (isEditMode) await axiosClient.put(`/laptops/${id}`, payload);
-      else await axiosClient.post('/laptops', payload);
+      if (isEditMode) await laptop_api.update_api(id, payload);
+      else await laptop_api.create_api(payload);
       navigate('/laptops');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save laptop');

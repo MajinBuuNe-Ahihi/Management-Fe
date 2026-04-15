@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Grid, Paper, Typography, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import axiosClient from '../../api/axiosClient';
+import { dashboard_api } from '../../api/dashboard_api';
 
 export default function Dashboard() {
   const theme = useTheme();
@@ -15,8 +15,8 @@ export default function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await axiosClient.get('/dashboard/stats');
-      setStats(res.data);
+      const data = await dashboard_api.get_stats_api();
+      setStats(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -44,33 +44,36 @@ export default function Dashboard() {
   return (
     <Box>
       <Typography variant={isMobile ? 'h5' : 'h4'} gutterBottom sx={{ mb: { xs: 2, sm: 4 }, fontWeight: 700 }}>
-        Dashboard Overview
+        Tổng quan hệ thống
       </Typography>
       
       <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: { xs: 2, sm: 4 } }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Total Laptops" value={stats?.totalLaptops} color="#7e57c2" />
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard title="Tổng số máy" value={stats?.totalLaptops} color="#1e3a8a" />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Total Sold" value={stats?.totalSold} color="#00e676" />
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard title="Đã bán" value={stats?.totalSold} color="#3b82f6" />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Total Deposited" value={stats?.totalDeposited} color="#ff9800" />
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard title="Đã đặt cọc" value={stats?.totalDeposited} color="#60a5fa" />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Inventory Value" value={`$${stats?.totalInventoryValue?.toLocaleString() || 0}`} color="#2196f3" />
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard title="Giá trị kho" value={new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stats?.totalInventoryValue || 0)} color="#94a3b8" />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard title="Tổng lợi nhuận" value={new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stats?.totalProfit || 0)} color="#10b981" />
         </Grid>
       </Grid>
 
       <Paper sx={{ p: { xs: 2, sm: 4 }, height: { xs: 300, sm: 400 } }}>
-        <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>Inventory Distribution</Typography>
+        <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>Phân bổ kho hàng</Typography>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis dataKey="name" stroke="#a0a0b0" />
             <YAxis stroke="#a0a0b0" />
-            <Tooltip contentStyle={{ backgroundColor: '#1a1a24', border: 'none', borderRadius: 8 }} />
-            <Bar dataKey="value" fill="#7e57c2" radius={[4, 4, 0, 0]} />
+            <Tooltip contentStyle={{ backgroundColor: '#101d35', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }} />
+            <Bar dataKey="value" fill="#1e3a8a" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Paper>

@@ -4,20 +4,20 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#7e57c2', // Deep purple
-      light: '#b085f5',
-      dark: '#4d2c91',
+      main: '#3b82f6', // Brighter blue (Blue 500) for visibility
+      light: '#60a5fa',
+      dark: '#1d4ed8',
     },
     secondary: {
-      main: '#00e676', // Bright neon green for accents
+      main: '#94a3b8', // Silver/Slate
     },
     background: {
-      default: '#0f0f13',
-      paper: '#1a1a24',
+      default: '#0a1929', // Very dark navy
+      paper: '#101d35',  // Solid navy matching logo
     },
     text: {
-      primary: '#e0e0e0',
-      secondary: '#a0a0b0',
+      primary: '#f8fafc',
+      secondary: '#94a3b8',
     }
   },
   typography: {
@@ -40,7 +40,7 @@ const theme = createTheme({
           transition: 'all 0.3s ease',
           '&:hover': {
             transform: 'translateY(-2px)',
-            boxShadow: '0 4px 12px rgba(126, 87, 194, 0.4)'
+            boxShadow: '0 4px 12px rgba(16, 29, 53, 0.4)'
           }
         }
       }

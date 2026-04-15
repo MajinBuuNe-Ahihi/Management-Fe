@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Box, Typography, Paper, TextField, Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip, Card, CardContent, Menu, MenuItem, ListItemIcon, ListItemText, Snackbar, useMediaQuery, useTheme } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, IosShare as ShareIcon, Remove as RemoveIcon, MoreVert as MoreVertIcon, ToggleOn as ToggleOnIcon, Sell as SellIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axiosClient from '../../api/axiosClient';
+import { laptop_api } from '../../api/laptop_api';
 import { copyToClipboard } from '../../utils/clipboard';
 
 export default function LaptopList() {
@@ -25,9 +25,9 @@ export default function LaptopList() {
 
   const fetchLaptops = async () => {
     try {
-      const res = await axiosClient.get(`/laptops?page=${page + 1}&limit=${rowsPerPage}&search=${search}`);
-      setLaptops(res.data.laptops || []);
-      setTotal(res.data.total || 0);
+      const data = await laptop_api.get_list_api({ page: page + 1, limit: rowsPerPage, search });
+      setLaptops(data.laptops || []);
+      setTotal(data.total || 0);
     } catch (err) {
       console.error(err);
     }
@@ -35,7 +35,7 @@ export default function LaptopList() {
 
   const handleSetStatus = async (row, status) => {
     try {
-      await axiosClient.put(`/laptops/${row.id}`, { status });
+      await laptop_api.update_api(row.id, { status });
       setLaptops((prev) => prev.map((item) => (item.id === row.id ? { ...item, status } : item)));
     } catch (err) {
       console.error(err);
@@ -47,7 +47,7 @@ export default function LaptopList() {
     const nextQuantity = Math.max(1, currentQuantity + delta);
     if (nextQuantity === currentQuantity) return;
     try {
-      await axiosClient.put(`/laptops/${row.id}`, {
+      await laptop_api.update_api(row.id, {
         quantity: nextQuantity,
       });
       setLaptops((prev) => prev.map((item) => (item.id === row.id ? { ...item, quantity: nextQuantity } : item)));
@@ -59,7 +59,7 @@ export default function LaptopList() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this laptop?')) {
       try {
-        await axiosClient.delete(`/laptops/${id}`);
+        await laptop_api.delete_api_request(`/laptops/${id}`);
         fetchLaptops();
       } catch (err) {
         console.error(err);
@@ -119,7 +119,7 @@ export default function LaptopList() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 1.5, sm: 0 }, mb: { xs: 2, sm: 4 } }}>
-        <Typography variant={isMobile ? 'h5' : 'h4'} sx={{ fontWeight: 700 }}>Laptop Inventory</Typography>
+        <Typography variant={isMobile ? 'h5' : 'h4'} sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>Inventory</Typography>
         <Button 
           variant="contained" 
           fullWidth={isMobile}

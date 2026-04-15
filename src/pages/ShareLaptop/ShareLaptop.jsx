@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogContent, IconButton, Link, Paper, Snackbar, Stack, Typography } from '@mui/material';
 import { Add as AddIcon, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, Remove as RemoveIcon, ZoomIn as ZoomInIcon } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
-import axiosClient from '../../api/axiosClient';
+import { laptop_api } from '../../api/laptop_api';
 import { getGoogleMapByValue, getGoogleMapEmbedUrl } from '../../config/googleMaps';
 
 function getImageUrls(input) {
@@ -71,10 +71,10 @@ export default function ShareLaptop() {
     const fetchShareData = async () => {
       setIsLoading(true);
       try {
-        const response = await axiosClient.get(`/laptops/share/${serialKey}`);
+        const data = await laptop_api.get_share_info_api(serialKey);
         if (!isMounted) return;
-        applySharePayload(response.data);
-        sharePageCache.set(serialKey, { timestamp: Date.now(), payload: response.data });
+        applySharePayload(data);
+        sharePageCache.set(serialKey, { timestamp: Date.now(), payload: data });
       } catch (err) {
         if (!isMounted) return;
         setError(err.response?.data?.message || 'Không tải được trang chia sẻ');
@@ -197,7 +197,7 @@ export default function ShareLaptop() {
 
               <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 0.5 }}>
                 {images.map((imageUrl, index) => (
-                  <Box key={`${imageUrl}-${index}`} onClick={() => setActiveImageIndex(index)} sx={{ border: index === activeImageIndex ? '2px solid #7e57c2' : '1px solid rgba(255,255,255,0.15)', borderRadius: 1, overflow: 'hidden', cursor: 'pointer', minWidth: 72, width: 72, height: 72 }}>
+                  <Box key={`${imageUrl}-${index}`} onClick={() => setActiveImageIndex(index)} sx={{ border: index === activeImageIndex ? '2px solid #1e3a8a' : '1px solid rgba(255,255,255,0.15)', borderRadius: 1, overflow: 'hidden', cursor: 'pointer', minWidth: 72, width: 72, height: 72 }}>
                     <img src={imageUrl} alt={`thumb-${index}`} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </Box>
                 ))}
@@ -277,7 +277,7 @@ export default function ShareLaptop() {
                           display: 'flex',
                           gap: 1.25,
                           cursor: 'pointer',
-                          '&:hover': { borderColor: 'rgba(126,87,194,0.7)', bgcolor: 'rgba(126,87,194,0.06)' }
+                          '&:hover': { borderColor: 'rgba(30, 58, 138, 0.7)', bgcolor: 'rgba(30, 58, 138, 0.06)' }
                         }}
                       >
                         <Box sx={{ width: 72, height: 72, borderRadius: 1, overflow: 'hidden', bgcolor: 'background.default', flexShrink: 0 }}>

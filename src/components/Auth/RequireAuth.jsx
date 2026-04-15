@@ -1,11 +1,11 @@
-import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAuthenticated } from '../../utils/auth';
+import { useSelector } from 'react-redux';
 
 export default function RequireAuth({ children }) {
-  // Redirect unauthenticated users to login page.
   const location = useLocation();
-  if (!isAuthenticated()) {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   return children;
