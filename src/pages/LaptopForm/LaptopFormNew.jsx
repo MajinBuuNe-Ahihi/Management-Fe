@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Alert, Box, Button, CircularProgress, Divider, FormControl, IconButton, 
-  InputLabel, MenuItem, Paper, Select, Snackbar, TextField, Typography, 
+  Box, Button, CircularProgress, Divider, FormControl, IconButton, 
+  InputLabel, MenuItem, Paper, Select, TextField, Typography, 
   useMediaQuery, useTheme 
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -13,18 +13,18 @@ import { laptop_api } from '../../api/laptop_api';
 import { upload_api } from '../../api/upload_api';
 import { copyToClipboard } from '../../utils/clipboard';
 import { GOOGLE_MAP_OPTIONS } from '../../config/googleMaps';
+import { useNotification } from '../../context/NotificationContext';
 
 export default function LaptopFormNew() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { serial } = useParams();
   const navigate = useNavigate();
+  const { notify } = useNotification();
   const isEditMode = Boolean(serial);
   
   const [formData, setFormData] = useState({ serial: '', brand: '', line: '', product_name: '', condition: '', cpu: '', ram: '', ssd: '', display: '', battery: '', weight: '', quantity: 1, price: '', warranty: '', location: '', raw_text_summary: '', seo_keywords: [], facebook_post: '', listImage: '', image_assets: [], createdDate: new Date().toISOString().slice(0, 10), source: 'AI', status: 0 });
   const [rawInformation, setRawInformation] = useState('');
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [pendingImages, setPendingImages] = useState([]);
@@ -48,14 +48,14 @@ export default function LaptopFormNew() {
           seo_keywords: Array.isArray(data?.seo_keywords) ? data.seo_keywords : []
         });
       } catch (err) {
-        setError(err.response?.data?.message || 'Không tải được dữ liệu sản phẩm');
+        notify(err.response?.data?.message || 'Không tải được dữ liệu sản phẩm', 'error');
         window.setTimeout(() => navigate('/laptops'), 1200);
       } finally {
         setIsLoading(false);
       }
     };
     fetchLaptopBySerial();
-  }, [isEditMode, serial, navigate]);
+  }, [isEditMode, serial, navigate, notify]);
 
   const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   const getStatusValue = () => Number(formData.status ?? 0);
@@ -67,7 +67,7 @@ export default function LaptopFormNew() {
     if (files.length === 0) return;
     const currentCount = pendingImages.length + (Array.isArray(formData.image_assets) ? formData.image_assets.length : 0);
     if (currentCount >= 5) {
-      setError('Tối đa 5 ảnh cho mỗi laptop');
+      notify('Tối đa 5 ảnh cho mỗi laptop', 'warning');
       e.target.value = '';
       return;
     }
@@ -97,8 +97,9 @@ export default function LaptopFormNew() {
           listImage: [...manualUrls, ...nextAssets.map((asset) => asset.url)].join('\n')
         };
       });
+      notify('Đã xóa ảnh thành công', 'success');
     } catch (err) {
-      setError(err.response?.data?.message || 'Xóa ảnh thất bại');
+      notify(err.response?.data?.message || 'Xóa ảnh thất bại', 'error');
     }
   };
 
@@ -122,13 +123,14 @@ export default function LaptopFormNew() {
   };
 
   const handleAnalyze = async () => {
-    if (!rawInformation.trim()) return setError('Vui lòng nhập nội dung cần phân tích.');
+    if (!rawInformation.trim()) return notify('Vui lòng nhập nội dung cần phân tích.', 'warning');
     try {
       setIsAnalyzing(true);
       const data = await laptop_api.extract_info_api(rawInformation);
       setFormData((prev) => ({ ...prev, ...data, source: 'AI' }));
+      notify('Đã phân tích thông tin bằng AI thành công', 'success');
     } catch (err) {
-      setError(err.response?.data?.message || 'Không thể phân tích thông tin.');
+      notify(err.response?.data?.message || 'Không thể phân tích thông tin.', 'error');
     } finally {
       setIsAnalyzing(false);
     }
@@ -173,15 +175,15 @@ export default function LaptopFormNew() {
         response = await laptop_api.create_api(finalPayload);
       }
       
-      // Handle Approval Required (Status 202)
       if (response?.status === 202 || (response?.message && response.message.includes('phê duyệt'))) {
-        setSuccessMsg(response.message || 'Yêu cầu của bạn đang chờ cấp trên phê duyệt.');
+        notify(response.message || 'Yêu cầu của bạn đang chờ cấp trên phê duyệt.', 'info');
         setTimeout(() => navigate('/laptops'), 3000);
       } else {
+        notify('Đã lưu thông tin sản phẩm thành công', 'success');
         navigate('/laptops');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Lưu thông tin thất bại');
+      notify(err.response?.data?.message || 'Lưu thông tin thất bại', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -190,9 +192,10 @@ export default function LaptopFormNew() {
   const handleCopy = async (value) => {
     try {
       const success = await copyToClipboard(String(value || ''));
-      if (!success) setError('Copy thất bại');
+      if (success) notify('Đã copy vào clipboard', 'success');
+      else notify('Copy thất bại', 'error');
     } catch (err) {
-      setError('Copy thất bại');
+      notify('Copy thất bại', 'error');
     }
   };
 
@@ -264,12 +267,102 @@ export default function LaptopFormNew() {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item size = {6}>
-                  <Button fullWidth variant="outlined" component="label" sx={{ height: '56px' }}>
-                    Upload ảnh
-                    <input hidden type="file" accept="image/*" multiple onChange={handleUploadImages} />
-                  </Button>
+                <Grid item size={12}>
+                  <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600, color: 'text.secondary' }}>
+                    Hình ảnh sản phẩm (Tối đa 5 ảnh)
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item size={{ xs: 12 }} spacing={2} container>
+                      <Button 
+                        fullWidth 
+                        variant="outlined" 
+                        component="label" 
+                        sx={{ 
+                          height: '100px', 
+                          width: '100px',
+                          borderStyle: 'dashed', 
+                          borderWidth: 2,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1,
+                          borderColor: 'divider',
+                          '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover' }
+                        }}
+                      >
+                        <Box sx={{ fontSize: '1.5rem' }}>+</Box>
+                        <Typography variant="caption" sx={{ fontWeight: 600 }}>Thêm ảnh</Typography>
+                        <input hidden type="file" accept="image/*" multiple onChange={handleUploadImages} />
+                      </Button>
+            
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                        {/* Persisted Images */}
+                        {formData.image_assets?.map((image) => (
+                          <Box 
+                            key={image.public_id || image.url} 
+                            sx={{ 
+                              position: 'relative', 
+                              width: 100, 
+                              height: 100, 
+                              borderRadius: 2, 
+                              overflow: 'hidden',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                              border: '1px solid',
+                              borderColor: 'divider'
+                            }}
+                          >
+                            <img src={image.url} alt="laptop" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <IconButton 
+                              size="small" 
+                              onClick={() => handleRemoveUploadedImage(image.public_id)} 
+                              sx={{ 
+                                position: 'absolute', top: 4, right: 4, zIndex: 2, 
+                                bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', 
+                                '&:hover': { bgcolor: 'error.main' } 
+                              }}
+                            >
+                              <CloseIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Box>
+                        ))}
+
+                        {/* Pending Uploads */}
+                        {pendingImages.map((item) => (
+                          <Box 
+                            key={item.id} 
+                            sx={{ 
+                              position: 'relative', 
+                              width: 100, 
+                              height: 100, 
+                              borderRadius: 2, 
+                              overflow: 'hidden',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                              border: '2px dashed',
+                              borderColor: 'primary.main',
+                              opacity: 0.8
+                            }}
+                          >
+                            <img src={item.previewUrl} alt="pending" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, bgcolor: 'primary.main', color: '#fff', py: 0.2, textAlign: 'center' }}>
+                              <Typography sx={{ fontSize: '10px', fontWeight: 700 }}>DRAFT</Typography>
+                            </Box>
+                            <IconButton 
+                              size="small" 
+                              onClick={() => handleRemovePendingImage(item.id)} 
+                              sx={{ 
+                                position: 'absolute', top: 4, right: 4, zIndex: 2, 
+                                bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', 
+                                '&:hover': { bgcolor: 'error.main' } 
+                              }}
+                            >
+                              <CloseIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Grid>
+
                 <Grid item size = {12}>
                   <Box sx={{ position: 'relative' }}>
                     <IconButton size="small" onClick={() => handleCopy(formData.raw_text_summary)} sx={{ position: 'absolute', top: 6, right: 6, zIndex: 2, bgcolor: 'rgba(0,0,0,0.55)', color: '#fff', '&:hover': { bgcolor: 'rgba(30, 58, 138, 0.85)' } }}>
@@ -303,17 +396,6 @@ export default function LaptopFormNew() {
           </>
         )}
       </Paper>
-      
-      {/* Messages */}
-      <Snackbar open={Boolean(error)} autoHideDuration={4000} onClose={() => setError('')} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
-        <Alert onClose={() => setError('')} severity="error" variant="filled">{error}</Alert>
-      </Snackbar>
-      
-      <Snackbar open={Boolean(successMsg)} autoHideDuration={4000} onClose={() => setSuccessMsg('')} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={() => setSuccessMsg('')} severity="info" variant="filled" sx={{ bgcolor: 'secondary.main' }}>
-          {successMsg}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

@@ -67,21 +67,14 @@ export default function CustomerList() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa thông tin này?')) return;
+    if (!window.confirm('Bạn có chắc chắn muốn xóa khách hàng này?')) return;
     try {
-      await customer_api.delete_api(`/customer-care/${id}`);
-      showToast('Đã xóa thành công', 'success');
+      await customer_api.delete_api(id);
+      showToast('Đã xóa khách hàng thành công', 'success');
       fetchData();
     } catch (err) {
       showToast('Xóa thất bại', 'error');
     }
-  };
-
-  const checkWarranty = (saleDate, months) => {
-    if (!saleDate || !months) return false;
-    const expiry = new Date(saleDate);
-    expiry.setMonth(expiry.getMonth() + Number(months));
-    return expiry > new Date();
   };
 
   const formatCurrency = (value) => {
@@ -91,7 +84,7 @@ export default function CustomerList() {
   return (
     <Box>
       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2} sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800 }}>Chăm sóc khách hàng</Typography>
+        <Typography variant="h4" sx={{ fontWeight: 800 }}>Danh sách khách hàng</Typography>
         <Button 
           variant="contained" 
           startIcon={<AddIcon />} 
@@ -122,18 +115,15 @@ export default function CustomerList() {
             <TableRow>
               <TableCell sx={{ fontWeight: 700 }}>Họ tên</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Số điện thoại</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Mã máy / Cấu hình</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Giá bán</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Lợi nhuận</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Ngày bán</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Bảo hành</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Trạng thái</TableCell>
+               <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
+               <TableCell sx={{ fontWeight: 700 }}>Ghi chú</TableCell>
+               <TableCell sx={{ fontWeight: 700 }}>Ngày tạo</TableCell>
+               <TableCell sx={{ fontWeight: 700 }}>Số lần mua máy</TableCell>
               <TableCell align="right" sx={{ fontWeight: 700 }}>Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {items.map((row) => {
-              const inWarranty = checkWarranty(row.sale_date, row.warranty_months);
               return (
                 <TableRow key={row.id} hover>
                   <TableCell>
@@ -141,26 +131,10 @@ export default function CustomerList() {
                     <Typography variant="caption" color="text.secondary">{row.customer_address}</Typography>
                   </TableCell>
                   <TableCell>{row.customer_phone}</TableCell>
-                  <TableCell sx={{ maxWidth: 250 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{row.machine_name || row.laptop_serial}</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {row.configuration}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>{formatCurrency(row.sale_price)}</TableCell>
-                  <TableCell sx={{ color: row.profit >= 0 ? 'success.main' : 'error.main', fontWeight: 600 }}>
-                    {formatCurrency(row.profit)}
-                  </TableCell>
-                  <TableCell>{new Date(row.sale_date).toLocaleDateString('vi-VN')}</TableCell>
-                  <TableCell>{row.warranty_months} tháng</TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={inWarranty ? "Còn bảo hành" : "Hết bảo hành"} 
-                      color={inWarranty ? "success" : "default"} 
-                      size="small" 
-                      variant={inWarranty ? "filled" : "outlined"}
-                    />
-                  </TableCell>
+                  <TableCell>{row.customer_email}</TableCell>
+                  <TableCell>{row.customer_note}</TableCell>
+                  <TableCell>{row.created_at}</TableCell>
+                  <TableCell>{row.purchase_count}</TableCell>
                   <TableCell align="right">
                     <IconButton size="small" onClick={() => handleOpenEdit(row)} color="primary"><EditIcon fontSize="small" /></IconButton>
                     <IconButton size="small" onClick={() => handleDelete(row.id)} color="error"><DeleteIcon fontSize="small" /></IconButton>

@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { clearAuthToken, getAuthToken } from '../utils/auth';
 
-const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/+$/, '');
-const apiBaseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 
 console.log('API Base URL configured as:', apiBaseUrl);
 

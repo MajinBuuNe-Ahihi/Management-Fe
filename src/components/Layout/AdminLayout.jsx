@@ -13,7 +13,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import PeopleIcon from '@mui/icons-material/People';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationBell from '../Notifications/NotificationBell';
 
 const drawerWidth = 260;
 
@@ -180,13 +180,7 @@ export default function AdminLayout() {
           
           <Box sx={{ flexGrow: 1 }} />
           
-          <Tooltip title="Thông báo">
-            <IconButton color="inherit" sx={{ mr: 1, color: 'rgba(255,255,255,0.6)' }}>
-              <Badge badgeContent={0} color="error" overlap="circular">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-          </Tooltip>
+          <NotificationBell />
         </Toolbar>
       </AppBar>
       
