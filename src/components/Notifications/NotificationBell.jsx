@@ -28,27 +28,37 @@ export default function NotificationBell() {
   useEffect(() => {
     fetchNotifications();
 
-    const socket = initSocket();
+    const socket = getSocket();
+    const handleNotification = (notif) => {
+      // optimistically add to list
+      setNotifications(prev => [
+        { 
+          id: Date.now(), 
+          title: notif.title, 
+          message: notif.message, 
+          data: notif.data, 
+          is_read: false, 
+          created_at: new Date().toISOString() 
+        }, 
+        ...prev
+      ]);
+      setUnreadCount(c => c + 1);
+    };
+
     if (socket) {
-      socket.on('notification', (notif) => {
-        // optimistically add to list
-        setNotifications(prev => [
-          { 
-            id: Date.now(), 
-            title: notif.title, 
-            message: notif.message, 
-            data: notif.data, 
-            is_read: false, 
-            created_at: new Date().toISOString() 
-          }, 
-          ...prev
-        ]);
-        setUnreadCount(c => c + 1);
-      });
+      socket.on('notification', handleNotification);
+    } else {
+      // Fallback: wait a bit for AdminLayout to init socket
+      const timer = setTimeout(() => {
+        const s = getSocket();
+        if (s) s.on('notification', handleNotification);
+      }, 1000);
+      return () => clearTimeout(timer);
     }
 
     return () => {
-      disconnectSocket();
+      const s = getSocket();
+      if (s) s.off('notification', handleNotification);
     };
   }, []);
 

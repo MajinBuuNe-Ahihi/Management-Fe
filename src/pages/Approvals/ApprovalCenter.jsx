@@ -34,20 +34,18 @@ export default function ApprovalCenter() {
 
   useEffect(() => {
     fetchRequests();
-
-    const socket = initSocket();
-    if (socket) {
-      socket.on('notification', (notif) => {
-        // If it's a new approval request, refresh the list
-        if (notif.data?.type === 'approval_required' || notif.title?.includes('phê duyệt')) {
-          fetchRequests();
-        }
-      });
-    }
-
-    return () => {
-      disconnectSocket();
+    
+    // Listen for real-time sync events
+    const handleRefresh = (e) => {
+      // Refresh approvals for any approval action OR module specific change
+      if (!e.detail || e.detail.module === 'approvals') {
+        console.log('Real-time sync: Refreshing approvals');
+        fetchRequests();
+      }
     };
+    
+    window.addEventListener('data-refresh', handleRefresh);
+    return () => window.removeEventListener('data-refresh', handleRefresh);
   }, []);
 
   const handleOpenDetail = (request) => {

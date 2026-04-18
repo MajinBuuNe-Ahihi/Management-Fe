@@ -49,6 +49,19 @@ export default function InvoiceList() {
     }, 500);
     return () => clearTimeout(timer);
   }, [search]);
+  
+  useEffect(() => {
+    // Listen for real-time sync events
+    const handleRefresh = (e) => {
+      if (!e.detail || e.detail.module === 'invoices') {
+        console.log('Real-time sync: Refreshing invoices');
+        fetchInvoices();
+      }
+    };
+    
+    window.addEventListener('data-refresh', handleRefresh);
+    return () => window.removeEventListener('data-refresh', handleRefresh);
+  }, []);
 
   const handleOpenAdd = () => {
     setSelectedInvoice(null);

@@ -20,6 +20,17 @@ export default function LaptopList() {
 
   useEffect(() => {
     fetchLaptops();
+    
+    // Listen for real-time sync events
+    const handleRefresh = (e) => {
+      if (!e.detail || e.detail.module === 'laptops') {
+        console.log('Real-time sync: Refreshing inventory');
+        fetchLaptops();
+      }
+    };
+    
+    window.addEventListener('data-refresh', handleRefresh);
+    return () => window.removeEventListener('data-refresh', handleRefresh);
     // eslint-disable-next-line
   }, [page, rowsPerPage, search]);
 

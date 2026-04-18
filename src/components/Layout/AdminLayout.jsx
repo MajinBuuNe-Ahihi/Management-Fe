@@ -14,6 +14,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import NotificationBell from '../Notifications/NotificationBell';
+import { getSocket, initSocket } from '../../utils/socket';
+import { useNotification } from '../../context/NotificationContext';
 
 const drawerWidth = 260;
 
@@ -42,6 +44,28 @@ export default function AdminLayout() {
   // Get user info from Redux
   const user = useSelector((state) => state.auth.user);
   const userRole = user?.role ?? 2;
+  const { notify } = useNotification();
+  
+  useEffect(() => {
+    const socket = initSocket();
+    if (socket) {
+      socket.on('data_change', (data) => {
+        console.log('Data change detected:', data);
+        // Dispatch custom event for child components to refresh
+        window.dispatchEvent(new CustomEvent('data-refresh', { detail: data }));
+        
+        // Optional: show a small notification if it's not a generic update
+        if (data.action === 'save' || data.action === 'delete' || data.action === 'approve') {
+          notify(`Dữ liệu ${data.module} vừa được cập nhật`, 'info');
+        }
+      });
+    }
+    
+    return () => {
+      const s = getSocket();
+      if (s) s.off('data_change');
+    };
+  }, [notify]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);

@@ -36,6 +36,17 @@ export default function StaffManagement() {
 
   useEffect(() => {
     fetchUsers();
+    
+    // Listen for real-time sync events
+    const handleRefresh = (e) => {
+      if (!e.detail || e.detail.module === 'users') {
+        console.log('Real-time sync: Refreshing users');
+        fetchUsers();
+      }
+    };
+    
+    window.addEventListener('data-refresh', handleRefresh);
+    return () => window.removeEventListener('data-refresh', handleRefresh);
   }, []);
 
   const handleOpen = (user = null) => {
