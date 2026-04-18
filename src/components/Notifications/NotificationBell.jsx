@@ -6,7 +6,7 @@ import {
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate } from 'react-router-dom';
 import { notification_api } from '../../api/notification_api';
-import { initSocket, disconnectSocket } from '../../utils/socket';
+import { initSocket, getSocket, disconnectSocket } from '../../utils/socket';
 
 export default function NotificationBell() {
   const [anchorEl, setAnchorEl] = useState(null);
