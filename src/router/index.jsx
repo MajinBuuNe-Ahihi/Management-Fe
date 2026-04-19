@@ -40,10 +40,10 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/dashboard" replace />,
+        element: <Navigate to="admin/dashboard" replace />,
       },
       {
-        path: 'dashboard',
+        path: 'admin/dashboard',
         element: (
           <RoleGuard allowedRoles={[0, 1]}>
             <Dashboard />
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'laptops',
+        path: 'admin/laptops',
         children: [
           {
             index: true,
@@ -68,11 +68,11 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'customers',
+        path: 'admin/customers',
         element: <CustomerList />,
       },
       {
-        path: 'invoices',
+        path: 'admin/invoices',
         element: (
           <RoleGuard allowedRoles={[0, 1]}>
             <InvoiceList />
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'approvals',
+        path: 'admin/approvals',
         element: (
           <RoleGuard allowedRoles={[0, 1]}>
             <ApprovalCenter />
@@ -88,7 +88,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'staff',
+        path: 'admin/staff',
         element: (
           <RoleGuard allowedRoles={[0]}>
             <StaffManagement />
@@ -96,7 +96,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'posts',
+        path: 'admin/posts',
         children: [
           { index: true, element: <PostList /> },
           { path: 'new', element: <PostForm /> },
@@ -108,17 +108,11 @@ const router = createBrowserRouter([
       //   element: <CategoryList />,
       // },
       {
-        path: 'inquiries',
+        path: 'admin/inquiries',
         element: <InquiryList />,
       },
     ],
-  },
-  {
-    path: '*',
-    element: <Navigate to="/dashboard" replace />,
-  },
-], {
-  basename: '/admin'
-});
+  }
+]);
 
 export default router;
