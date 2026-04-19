@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { clearAuthToken, getAuthToken } from '../utils/auth';
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api') + '/admin-dashboard';
 
 console.log('API Base URL configured as:', apiBaseUrl);
 

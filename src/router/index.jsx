@@ -16,6 +16,10 @@ import CustomerList from '../pages/CustomerCare/CustomerList';
 import StaffManagement from '../pages/Staff/StaffManagement';
 import InvoiceList from '../pages/Invoices/InvoiceList';
 import ApprovalCenter from '../pages/Approvals/ApprovalCenter';
+import PostList from '../pages/Content/PostList';
+import PostForm from '../pages/Content/PostForm';
+// import CategoryList from '../pages/Content/CategoryList';
+import InquiryList from '../pages/Inquiries/InquiryList';
 
 const router = createBrowserRouter([
   {
@@ -90,6 +94,22 @@ const router = createBrowserRouter([
             <StaffManagement />
           </RoleGuard>
         ),
+      },
+      {
+        path: 'posts',
+        children: [
+          { index: true, element: <PostList /> },
+          { path: 'new', element: <PostForm /> },
+          { path: 'edit/:id', element: <PostForm /> },
+        ]
+      },
+      // {
+      //   path: 'categories',
+      //   element: <CategoryList />,
+      // },
+      {
+        path: 'inquiries',
+        element: <InquiryList />,
       },
     ],
   },

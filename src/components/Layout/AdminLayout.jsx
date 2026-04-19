@@ -13,6 +13,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import PeopleIcon from '@mui/icons-material/People';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import ArticleIcon from '@mui/icons-material/Article';
+// import CategoryIcon from '@mui/icons-material/Category';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import NotificationBell from '../Notifications/NotificationBell';
 import { getSocket, initSocket } from '../../utils/socket';
 import { useNotification } from '../../context/NotificationContext';
@@ -25,6 +28,9 @@ const menuItems = [
   { text: 'Khách hàng', icon: <PersonIcon />, path: '/customers', roles: [0, 1, 2] },
   { text: 'Hóa đơn', icon: <ReceiptLongIcon />, path: '/invoices', roles: [0, 1] },
   { text: 'Duyệt yêu cầu', icon: <AssignmentTurnedInIcon />, path: '/approvals', roles: [0, 1] },
+  { text: 'Tin tức', icon: <ArticleIcon />, path: '/posts', roles: [0, 1] },
+// { text: 'Danh mục', icon: <CategoryIcon />, path: '/categories', roles: [0, 1] },
+  { text: 'Yêu cầu tư vấn', icon: <QuestionAnswerIcon />, path: '/inquiries', roles: [0, 1, 2] },
   { text: 'Nhân viên', icon: <PeopleIcon />, path: '/staff', roles: [0] }
 ];
 

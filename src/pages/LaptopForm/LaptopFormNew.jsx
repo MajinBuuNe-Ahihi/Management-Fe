@@ -11,6 +11,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useNavigate, useParams } from 'react-router-dom';
 import { laptop_api } from '../../api/laptop_api';
 import { upload_api } from '../../api/upload_api';
+import { category_api } from '../../api/content_api';
 import { copyToClipboard } from '../../utils/clipboard';
 import { GOOGLE_MAP_OPTIONS } from '../../config/googleMaps';
 import { useNotification } from '../../context/NotificationContext';
@@ -23,7 +24,15 @@ export default function LaptopFormNew() {
   const { notify } = useNotification();
   const isEditMode = Boolean(serial);
   
-  const [formData, setFormData] = useState({ serial: '', brand: '', line: '', product_name: '', condition: '', cpu: '', ram: '', ssd: '', display: '', battery: '', weight: '', quantity: 1, price: '', warranty: '', location: '', raw_text_summary: '', seo_keywords: [], facebook_post: '', listImage: '', image_assets: [], createdDate: new Date().toISOString().slice(0, 10), source: 'AI', status: 0 });
+  const [formData, setFormData] = useState({ 
+    serial: '', brand: '', line: '', product_name: '', condition: '', 
+    cpu: '', ram: '', ssd: '', display: '', battery: '', weight: '', 
+    quantity: 1, price: '', warranty: '', location: '', raw_text_summary: '', 
+    seo_keywords: [], facebook_post: '', listImage: '', image_assets: [], 
+    createdDate: new Date().toISOString().slice(0, 10), source: 'AI', status: 0,
+    segment: 'Budget', is_deal: false, original_price: 0.0, category_id: ''
+  });
+  const [categories, setCategories] = useState([]);
   const [rawInformation, setRawInformation] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,27 +43,31 @@ export default function LaptopFormNew() {
     : GOOGLE_MAP_OPTIONS;
 
   useEffect(() => {
-    if (!isEditMode || !serial) return;
-    const fetchLaptopBySerial = async () => {
-      setIsLoading(true);
+    const fetchInitialData = async () => {
       try {
-        const decodedSerial = decodeURIComponent(serial);
-        const data = await laptop_api.get_by_serial_api(decodedSerial);
-        setFormData({
-          ...data,
-          quantity: Number(data?.quantity) > 0 ? Number(data.quantity) : 1,
-          status: Number.isInteger(Number(data?.status)) ? Number(data.status) : 0,
-          createdDate: data?.createdDate ? data.createdDate.slice(0, 10) : new Date().toISOString().slice(0, 10),
-          seo_keywords: Array.isArray(data?.seo_keywords) ? data.seo_keywords : []
-        });
+        const cats = await category_api.get_all_api('laptop');
+        setCategories(cats);
+        
+        if (isEditMode && serial) {
+          setIsLoading(true);
+          const decodedSerial = decodeURIComponent(serial);
+          const data = await laptop_api.get_by_serial_api(decodedSerial);
+          setFormData({
+            ...data,
+            quantity: Number(data?.quantity) > 0 ? Number(data.quantity) : 1,
+            status: Number.isInteger(Number(data?.status)) ? Number(data.status) : 0,
+            createdDate: data?.createdDate ? data.createdDate.slice(0, 10) : new Date().toISOString().slice(0, 10),
+            seo_keywords: Array.isArray(data?.seo_keywords) ? data.seo_keywords : [],
+            category_id: data?.category_id || ''
+          });
+        }
       } catch (err) {
-        notify(err.response?.data?.message || 'Không tải được dữ liệu sản phẩm', 'error');
-        window.setTimeout(() => navigate('/laptops'), 1200);
+        notify(err.response?.data?.message || 'Không tải được dữ liệu', 'error');
       } finally {
         setIsLoading(false);
       }
     };
-    fetchLaptopBySerial();
+    fetchInitialData();
   }, [isEditMode, serial, navigate, notify]);
 
   const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -266,6 +279,46 @@ export default function LaptopFormNew() {
                       <MenuItem value={2}>Đã bán</MenuItem>
                     </Select>
                   </FormControl>
+                </Grid>
+                <Grid item size = {6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Phân khúc (AI)</InputLabel>
+                    <Select name="segment" value={formData.segment || 'Budget'} label="Phân khúc (AI)" onChange={handleChange}>
+                      <MenuItem value="Budget">Bình dân (Budget)</MenuItem>
+                      <MenuItem value="Business">Doanh nhân (Business)</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item size = {6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Nhóm hãng (Category)</InputLabel>
+                    <Select name="category_id" value={formData.category_id || ''} label="Nhóm hãng (Category)" onChange={handleChange}>
+                      {categories.map((c) => (
+                        <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item size = {6}>
+                  <TextField 
+                    fullWidth 
+                    label="Giá gốc (Original Price)" 
+                    name="original_price" 
+                    type="number" 
+                    value={formData.original_price || 0} 
+                    onChange={handleChange} 
+                    variant="outlined" 
+                  />
+                </Grid>
+                <Grid item size = {6} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Button 
+                      variant={formData.is_deal ? "contained" : "outlined"} 
+                      color="warning" 
+                      fullWidth
+                      onClick={() => setFormData(prev => ({ ...prev, is_deal: !prev.is_deal }))}
+                    >
+                      {formData.is_deal ? "ĐANG LÀ DEAL HOT" : "ĐẶT LÀM DEAL HOT"}
+                    </Button>
                 </Grid>
                 <Grid item size={12}>
                   <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600, color: 'text.secondary' }}>

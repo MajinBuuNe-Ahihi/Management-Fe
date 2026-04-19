@@ -214,52 +214,55 @@ export default function ShareLaptop() {
                 <Typography variant="body2">
                   <strong>Bản đồ:</strong>{' '}
                   <Link href={selectedMap.mapUrl} target="_blank" rel="noopener noreferrer" underline="hover">
-                    Xem trên Google Maps
-                  </Link>
+                  Xem trên Google Maps
+                </Link>
                 </Typography>
-              ) : null}
-              {selectedMapEmbedUrl ? (
-                <Box>
-                  {!isMapVisible ? (
-                    <Button variant="outlined" size="small" onClick={() => setIsMapVisible(true)}>Hiển thị bản đồ</Button>
-                  ) : (
-                    <Box sx={{ borderRadius: 1.5, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
-                      <Box
-                        component="iframe"
-                        title={`map-${selectedMap.value}`}
-                        src={selectedMapEmbedUrl}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        sx={{ width: '100%', height: { xs: 220, sm: 300 }, border: 0, display: 'block' }}
-                      />
-                    </Box>
-                  )}
+          ) : null}
+          {selectedMapEmbedUrl ? (
+            <Box>
+              {!isMapVisible ? (
+                <Button variant="outlined" size="small" onClick={() => setIsMapVisible(true)}>Hiển thị bản đồ</Button>
+              ) : (
+                <Box sx={{ borderRadius: 1.5, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  <Box
+                    component="iframe"
+                    title={`map-${selectedMap.value}`}
+                    src={selectedMapEmbedUrl}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    sx={{ width: '100%', height: { xs: 220, sm: 300 }, border: 0, display: 'block' }}
+                  />
                 </Box>
-              ) : null}
-              <Box sx={{ p: 1.5, border: '1px solid rgba(255,255,255,0.12)', borderRadius: 1.5 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.75 }}>Liên hệ</Typography>
-                <Typography variant="body2"><strong>Người phụ trách:</strong> {adminContact?.name || 'Admin'}</Typography>
-                {adminContact?.phone ? (
-                  <Typography variant="body2">
-                    <strong>Điện thoại:</strong> <Link href={`tel:${adminContact.phone}`} underline="hover">{adminContact.phone}</Link>
+              )}
+            </Box>
+          ) : null}
+          <Box sx={{ p: 1.5, border: '1px solid rgba(255,255,255,0.12)', borderRadius: 1.5 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.75 }}>Liên hệ</Typography>
+            <Typography variant="body2"><strong>Người phụ trách:</strong> {adminContact?.name || 'Admin'}</Typography>
+            {adminContact?.phone ? (
+              <Typography variant="body2">
+                <strong>Điện thoại:</strong> <Link href={`tel:${adminContact.phone}`} underline="hover">{adminContact.phone}</Link>
                   </Typography>
                 ) : null}
-                {adminContact?.email ? (
-                  <Typography variant="body2">
-                    <strong>Email:</strong> <Link href={`mailto:${adminContact.email}`} underline="hover">{adminContact.email}</Link>
+          {adminContact?.email ? (
+            <Typography variant="body2">
+              <strong>Email:</strong> <Link href={`mailto:${adminContact.email}`} underline="hover">{adminContact.email}</Link>
                   </Typography>
-                ) : null}
-                {adminContact?.zalo ? (
-                  <Typography variant="body2">
-                    <strong>Zalo:</strong> <Link href={adminContact.zalo} target="_blank" rel="noopener noreferrer" underline="hover">{adminContact.zalo}</Link>
+      ) : null}
+      {adminContact?.zalo ? (
+        <Typography variant="body2">
+          <strong>Zalo:</strong> <Link href={adminContact.zalo} target="_blank" rel="noopener noreferrer" underline="hover">{adminContact.zalo}</Link>
                   </Typography>
-                ) : null}
-                {adminContact?.facebook ? (
-                  <Typography variant="body2">
-                    <strong>Facebook:</strong> <Link href={adminContact.facebook} target="_blank" rel="noopener noreferrer" underline="hover">{adminContact.facebook}</Link>
-                  </Typography>
-                ) : null}
-              </Box>
+  ) : null
+}
+{
+  adminContact?.facebook ? (
+    <Typography variant="body2">
+      <strong>Facebook:</strong> <Link href={adminContact.facebook} target="_blank" rel="noopener noreferrer" underline="hover">{adminContact.facebook}</Link>
+                  </Typography >
+                ) : null
+}
+              </Box >
               <Box>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Sản phẩm liên quan</Typography>
                 {relatedProducts.length === 0 ? (
@@ -319,12 +322,12 @@ export default function ShareLaptop() {
                     ))}
                   </Stack>
                 )}
-              </Box>
+              </Box >
 
               
-            </Stack>
+            </Stack >
           )}
-        </Paper>
+        </Paper >
       )}
 
       <Dialog open={isZoomOpen} onClose={handleCloseZoom} fullWidth maxWidth="lg">
@@ -342,6 +345,6 @@ export default function ShareLaptop() {
       <Snackbar open={Boolean(error)} autoHideDuration={4000} onClose={() => setError('')} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
         <Alert severity="error" variant="filled" onClose={() => setError('')}>{error}</Alert>
       </Snackbar>
-    </Box>
+    </Box >
   );
 }
