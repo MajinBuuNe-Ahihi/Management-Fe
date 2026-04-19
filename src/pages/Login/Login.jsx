@@ -157,7 +157,7 @@ export default function Login() {
         user: data.user 
       }));
       
-      const redirectPath = location.state?.from?.pathname || '/dashboard';
+      const redirectPath = location.state?.from?.pathname || 'admin/dashboard';
       navigate(redirectPath, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Sai thông tin đăng nhập');

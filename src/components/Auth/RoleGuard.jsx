@@ -12,7 +12,7 @@ export default function RoleGuard({ children, allowedRoles }) {
 
   if (userRole === undefined || !allowedRoles.includes(userRole)) {
     // If not authorized, redirect to dashboard or safe area
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   return children;

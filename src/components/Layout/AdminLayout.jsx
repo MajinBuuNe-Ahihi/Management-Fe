@@ -23,15 +23,15 @@ import { useNotification } from '../../context/NotificationContext';
 const drawerWidth = 260;
 
 const menuItems = [
-  { text: 'Bảng điều khiển', icon: <DashboardIcon />, path: '/dashboard', roles: [0, 1] },
-  { text: 'Kho máy', icon: <LaptopMacIcon />, path: '/laptops', roles: [0, 1, 2] },
-  { text: 'Khách hàng', icon: <PersonIcon />, path: '/customers', roles: [0, 1, 2] },
-  { text: 'Hóa đơn', icon: <ReceiptLongIcon />, path: '/invoices', roles: [0, 1] },
-  { text: 'Duyệt yêu cầu', icon: <AssignmentTurnedInIcon />, path: '/approvals', roles: [0, 1] },
-  { text: 'Tin tức', icon: <ArticleIcon />, path: '/posts', roles: [0, 1] },
+  { text: 'Bảng điều khiển', icon: <DashboardIcon />, path: 'admin/dashboard', roles: [0, 1] },
+  { text: 'Kho máy', icon: <LaptopMacIcon />, path: 'admin/laptops', roles: [0, 1, 2] },
+  { text: 'Khách hàng', icon: <PersonIcon />, path: 'admin/customers', roles: [0, 1, 2] },
+  { text: 'Hóa đơn', icon: <ReceiptLongIcon />, path: 'admin/invoices', roles: [0, 1] },
+  { text: 'Duyệt yêu cầu', icon: <AssignmentTurnedInIcon />, path: 'admin/approvals', roles: [0, 1] },
+  { text: 'Tin tức', icon: <ArticleIcon />, path: 'admin/posts', roles: [0, 1] },
 // { text: 'Danh mục', icon: <CategoryIcon />, path: '/categories', roles: [0, 1] },
-  { text: 'Yêu cầu tư vấn', icon: <QuestionAnswerIcon />, path: '/inquiries', roles: [0, 1, 2] },
-  { text: 'Nhân viên', icon: <PeopleIcon />, path: '/staff', roles: [0] }
+  { text: 'Yêu cầu tư vấn', icon: <QuestionAnswerIcon />, path: 'admin/inquiries', roles: [0, 1, 2] },
+  { text: 'Nhân viên', icon: <PeopleIcon />, path: 'admin/staff', roles: [0] }
 ];
 
 const ROLE_LABELS = {
